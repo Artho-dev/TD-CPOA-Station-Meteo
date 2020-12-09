@@ -1,5 +1,12 @@
 package fr.amu.iut.weatherstation.exo1;
 
+import fr.amu.iut.weatherstation.exo2.ConsoleDisplay;
+import fr.amu.iut.weatherstation.exo2.Display;
+import fr.amu.iut.weatherstation.exo2.KitchenDisplay;
+import fr.amu.iut.weatherstation.exo2.SmartphoneDisplay;
+
+import java.util.ArrayList;
+
 public class WeatherStation {
     private TemperatureSensor temperatureSensor;
     private HumiditySensor humiditySensor;
@@ -7,12 +14,16 @@ public class WeatherStation {
     private float temperature;
     private float humidity;
     private float pressure;
+    private ArrayList<Display> displayList;
 
 
     public WeatherStation(TemperatureSensor temperatureSensor, HumiditySensor humiditySensor, PressureSensor pressureSensor){
         this.temperatureSensor = temperatureSensor;
         this.humiditySensor = humiditySensor;
         this.pressureSensor = pressureSensor;
+        displayList.add(new ConsoleDisplay());
+        displayList.add(new KitchenDisplay());
+        displayList.add(new SmartphoneDisplay());
     }
 
     public float getTemperature(){
@@ -28,9 +39,17 @@ public class WeatherStation {
     public void pollSensors(){
 
         // Ask each sensor for its value and store it
-        this.temperature = temperatureSensor.takeMeasurement();
-        this.humidity = humiditySensor.takeMeasurement();
-        this.pressure = pressureSensor.takeMeasurement();
+        if (temperature != temperatureSensor.takeMeasurement() ||
+            humidity != humiditySensor.takeMeasurement() ||
+            pressure != pressureSensor.takeMeasurement())
+        {
+            this.temperature = temperatureSensor.takeMeasurement();
+            this.humidity = humiditySensor.takeMeasurement();
+            this.pressure = pressureSensor.takeMeasurement();
 
+            for (Display d: displayList) {
+                d.update(temperature, humidity, pressure);
+            }
+        }
     }
 }
